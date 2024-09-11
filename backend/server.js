@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import { connectToMongo } from './db.js'
+import { UserRouter } from './routes/UserRoute.js'
 
 // added dotenv configuration for .env files
 dotenv.config()
@@ -15,9 +16,7 @@ const port = process.env.PORT
 app.use(express.json())
 
 // available routes
-app.get('/', (req, res) => {
-    res.send('Hello Friend')
-})
+app.use('/api/user', UserRouter)
 
 // app listening at port 8000
 app.listen(port, () => {
