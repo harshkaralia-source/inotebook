@@ -2,6 +2,13 @@ import express from 'express'
 import UserSchema from '../models/User.js'
 import { body, validationResult } from 'express-validator'
 import bcrypt from 'bcryptjs'
+import dotenv from 'dotenv'
+import jwt from 'jsonwebtoken'
+
+// added dotenv configuration for .env files
+dotenv.config()
+
+const JWT_SECRET = process.env.JWT_STRING
 
 export const UserRouter = express.Router()
 
@@ -36,8 +43,19 @@ UserRouter.post('/createuser', [
             name: req.body.name,
             email: req.body.email,
             password: securePassword
-        }).then(user => res.json(user)) // sending the created user as json response
-            .catch(error => console.log(error)) // logging any potential errors
+        })
+
+        // getting user id as data for jwt
+        const data = {
+            user: {
+                id: user.id
+            }
+        }
+
+        const authToken = jwt.sign(data, JWT_SECRET)
+
+        // sending the auth token as json response
+        res.json({authToken})
 
     } catch (error) {
         console.log(error.message)
