@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken'
 // added dotenv configuration for .env files
 dotenv.config()
 
+// fetching jwt string from .env file
 const JWT_SECRET = process.env.JWT_STRING
 
 export const UserRouter = express.Router()
@@ -37,6 +38,7 @@ UserRouter.post('/createuser', [
         // hashing password
         const securePassword = await bcrypt.hash(req.body.password, salt)
 
+        // creating a user
         user.create({
 
             // setting the fields from request body
@@ -45,20 +47,74 @@ UserRouter.post('/createuser', [
             password: securePassword
         })
 
-        // getting user id as data for jwt
+        // sending payload data
         const data = {
             user: {
                 id: user.id
             }
         }
 
+        // generating jwt with user data and signing in using secret key
         const authToken = jwt.sign(data, JWT_SECRET)
 
         // sending the auth token as json response
-        res.json({authToken})
+        res.json({ authToken })
 
     } catch (error) {
         console.log(error.message)
-        res.status(500).send('Some error occured')
+        res.status(500).send('Internal server error')
+    }
+})
+
+// Route 2 - log in a user "api/user/login"
+UserRouter.post('/login', [
+
+    // validating the fields
+    body('email', 'Enter a valid name').isEmail(),
+    body('password', 'Password must be at least 5 characters').isLength({ min: 5 })
+], async (req, res) => {
+
+    try {
+
+        // checking for validation errors
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() })
+        }
+
+        // fetching email and password from request body
+        const { email, password } = req.body
+
+        let user = await UserSchema.findOne({email})
+
+        // if user does not exist send 400 bad request and message
+        if (!user) {
+            return res.status(400).json({ error: 'Please try to log in with correct credentials' })
+        }
+
+        // comparing passwords
+        const passwordCompare = await bcrypt.compare(password, user.password)
+
+        // if password does not match send 400 bad request and message
+        if (!passwordCompare) {
+            return res.status(400).json({ error: 'Please try to log in with correct credentials' })
+        }
+
+        // sending payload data
+        const data = {
+            user: {
+                id: user.id
+            }
+        }
+
+        // generating jwt with user data and signing in using secret key
+        const authToken = jwt.sign(data, JWT_SECRET)
+
+        // sending the auth token as json response
+        res.json({ authToken })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Internal server error')
     }
 })
