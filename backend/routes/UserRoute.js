@@ -4,12 +4,13 @@ import { body, validationResult } from 'express-validator'
 import bcrypt from 'bcryptjs'
 import dotenv from 'dotenv'
 import jwt from 'jsonwebtoken'
+import fetchUser from '../middlewares/fetchUser.js'
 
 // added dotenv configuration for .env files
 dotenv.config()
 
 // fetching jwt string from .env file
-const JWT_SECRET = process.env.JWT_STRING
+const JWT_SECRET = process.env.JWT_SECRET
 
 export const UserRouter = express.Router()
 
@@ -85,7 +86,8 @@ UserRouter.post('/login', [
         // fetching email and password from request body
         const { email, password } = req.body
 
-        let user = await UserSchema.findOne({email})
+        // verifying if user exists
+        let user = await UserSchema.findOne({ email })
 
         // if user does not exist send 400 bad request and message
         if (!user) {
@@ -113,6 +115,25 @@ UserRouter.post('/login', [
         // sending the auth token as json response
         res.json({ authToken })
 
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Internal server error')
+    }
+})
+
+// Route 3 - get logged in user details "api/user/getuser"
+UserRouter.post('/getuser', fetchUser, async (req, res) => {
+
+    try {
+
+        // extracting user id from request object
+        const userId = req.user.id
+
+        // fetching user information from db except password
+        const user = await UserSchema.findById(userId).select('-password')
+        
+        // sending user information as a response
+        res.send(user)
     } catch (error) {
         console.log(error)
         res.status(500).send('Internal server error')
