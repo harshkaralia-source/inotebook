@@ -131,7 +131,7 @@ UserRouter.post('/getuser', fetchUser, async (req, res) => {
 
         // fetching user information from db except password
         const user = await UserSchema.findById(userId).select('-password')
-        
+
         // sending user information as a response
         res.send(user)
     } catch (error) {
