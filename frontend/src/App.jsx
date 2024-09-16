@@ -10,10 +10,13 @@ const App = () => {
     <div>
       <NoteState>
         <Navbar />
-        <Routes>
-          <Route path='/' Component={Home} />
-          <Route path='/about' Component={About} />
-        </Routes>
+        <div className="container">
+
+          <Routes>
+            <Route path='/' Component={Home} />
+            <Route path='/about' Component={About} />
+          </Routes>
+        </div>
       </NoteState>
     </div>
   )

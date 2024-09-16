@@ -1,7 +1,15 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
 const Navbar = () => {
+
+    // initializing use location
+    let location = useLocation()
+
+    useEffect(() => {
+        console.log(location.pathname)
+    }, [location])
+
     return (
         <nav className="navbar navbar-expand-lg bg-dark">
             <div className="container-fluid">
@@ -12,10 +20,10 @@ const Navbar = () => {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <Link to='/' className="nav-item text-decoration-none">
-                            <span className="nav-link text-white active" aria-current="page" href="#">Home</span>
+                            <span className={`${location.pathname === '/' ? 'text-white' : ""} nav-link text-secondary`} aria-current="page" href="#">Home</span>
                         </Link>
                         <Link to='/about' className="nav-item text-decoration-none">
-                            <span className="nav-link text-white" href="#">About</span>
+                            <span className={`${location.pathname === '/about' ? 'text-white' : ""} nav-link text-secondary`} href="#">About</span>
                         </Link>
                     </ul>
                 </div>
