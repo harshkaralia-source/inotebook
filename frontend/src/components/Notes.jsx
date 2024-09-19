@@ -11,8 +11,8 @@ const Notes = () => {
         <div className='my-3'>
             <h2>Your notes</h2>
             <div className="d-flex gap-4 flex-wrap mt-3">
-                {notes.map(note => {
-                    return <NoteItem note={note} />
+                {notes.map((note, index) => {
+                    return <NoteItem note={note} key={index} />
                 })}
             </div>
         </div>
